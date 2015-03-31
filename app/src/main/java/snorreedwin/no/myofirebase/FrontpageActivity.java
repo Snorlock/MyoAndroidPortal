@@ -1,26 +1,20 @@
 package snorreedwin.no.myofirebase;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.system.OsConstants;
 import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
-
-import org.json.JSONObject;
-
-import java.util.Map;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -76,8 +70,10 @@ public class FrontpageActivity extends Activity {
         startActivityForResult(intent, FirebaseWebview);
     }
 
-    public void clearCookie(View v) {
+    public void clearCookieAndToken(View v) {
         CookieManager.getInstance().removeAllCookie();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().clear().apply();
     }
 
     public void getToken(View v) {
@@ -94,13 +90,12 @@ public class FrontpageActivity extends Activity {
         FirebaseAdmin admin = new FirebaseAdmin();
         FirebaseAdminAPI service = admin.getService();
         String token = App.getObscurifier().getUncryptFirebaseAdminToken();
-        token = token.split("=")[1];
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, "getting value from api with "+token, duration);
-
-        toast.show();
 
         if(token != null) {
+            token = token.split("=")[1];
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, "getting value from api with "+token, duration);
+            toast.show();
             service.fetchUser(token, new Callback<Account>(){
 
                 @Override
@@ -116,6 +111,11 @@ public class FrontpageActivity extends Activity {
                     Log.d("lol", error.toString());
                 }
             });
+        }
+        else {
+            int duration = Toast.LENGTH_LONG;
+            Toast toast = Toast.makeText(context, "Please connect to firebase", duration);
+            toast.show();
         }
     }
 

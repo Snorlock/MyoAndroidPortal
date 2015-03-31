@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,7 +38,7 @@ public class MyoService extends Service {
         context = this;
         bus = App.getBus();
         listener = new MyoListener();
-        prefs = getSharedPreferences("appname", MODE_PRIVATE);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         myFirebaseRef = new Firebase("https://"+ prefs.getString("appname", "null")+".firebaseio.com/");
     }
 
@@ -59,11 +60,14 @@ public class MyoService extends Service {
             Hub.getInstance().setSendUsageData(false);
             Hub.getInstance().setLockingPolicy(Hub.LockingPolicy.STANDARD);
             Hub.getInstance().addListener(listener);
+            boolean connected = Hub.getInstance().getConnectedDevices().size() > 0;
 
 
-            Intent scanActivity = new Intent(context, ScanActivity.class);
-            scanActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(scanActivity);
+            if(!connected) {
+                Intent scanActivity = new Intent(context, ScanActivity.class);
+                scanActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(scanActivity);
+            }
             isRunning = true;
         }
 

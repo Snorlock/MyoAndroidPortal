@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -30,7 +31,7 @@ public class ListFirebaseAppsActivity extends Activity {
         ListView listView = (ListView)findViewById(R.id.mylist);
         context = this;
 
-        final SharedPreferences prefs = getSharedPreferences("appname", MODE_PRIVATE);
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.getString("appname", "no app selected");
         final int duration = Toast.LENGTH_LONG;
         Toast toast = Toast.makeText(context, "Selected app is: "+prefs.getString("appname", "no app selected"), duration);
